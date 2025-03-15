@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class SkySurvivor extends JFrame {
     private JPanel startPanel;
@@ -11,13 +13,26 @@ public class SkySurvivor extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
-        createStartPanel();
-        add(startPanel);
-    }
-
-    private void createStartPanel() {
         startPanel = new JPanel();
         startPanel.setLayout(new GridBagLayout());
+
+        JButton startButton = new JButton("Start Game");
+        JButton exitButton = new JButton("Exit");
+
+        startButton.setFont(new Font("Arial", Font.BOLD, 24));
+        exitButton.setFont(new Font("Arial", Font.BOLD, 24));
+
+        startButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // No functionality yet
+            }
+        });
+
+        exitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
@@ -25,19 +40,19 @@ public class SkySurvivor extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        JButton startButton = new JButton("Start Game");
-        startButton.setFont(new Font("Arial", Font.BOLD, 24));
-        // No functionality yet
         buttonPanel.add(startButton, gbc);
+        buttonPanel.add(exitButton, gbc);
 
         startPanel.add(buttonPanel);
+        add(startPanel);
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            SkySurvivor game = new SkySurvivor();
-            game.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                SkySurvivor game = new SkySurvivor();
+                game.setVisible(true);
+            }
         });
     }
 }
-
