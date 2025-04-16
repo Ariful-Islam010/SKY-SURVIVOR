@@ -1,58 +1,47 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 public class SkySurvivor extends JFrame {
-    private JPanel startPanel;
-
+    JPanel menuPanel;
+    GamePanel gamePanel;
+     boolean gameOver=false;
     public SkySurvivor() {
-        setTitle("Sky Survivor");
-        setSize(600, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setResizable(false);
+        this.setTitle("Sky Survivor");
+        this.setSize(600, 600);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null);
+        this.setResizable(false);
+        makeMenu();
+        this.add(menuPanel);
+    }
+    void makeMenu(){
+        menuPanel = new JPanel();
 
-        startPanel = new JPanel();
-        startPanel.setLayout(new GridBagLayout());
-
-        JButton startButton = new JButton("Start Game");
-        JButton exitButton = new JButton("Exit");
-
-        startButton.setFont(new Font("Arial", Font.BOLD, 24));
-        exitButton.setFont(new Font("Arial", Font.BOLD, 24));
-
-        startButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // No functionality yet
-            }
-        });
-
-        exitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
-
+        menuPanel.setLayout(new GridBagLayout());
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-
-        buttonPanel.add(startButton, gbc);
-        buttonPanel.add(exitButton, gbc);
-
-        startPanel.add(buttonPanel);
-        add(startPanel);
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                SkySurvivor game = new SkySurvivor();
-                game.setVisible(true);
+         GridBagConstraints gbc=new GridBagConstraints();
+        gbc.insets=new Insets(10, 10, 10, 10);
+        JButton startButton=new JButton("Start Game");
+        startButton.setFont(new Font("Arial", Font.BOLD, 24));
+        startButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                startGame();
             }
         });
+        buttonPanel.add(startButton, gbc);
+        menuPanel.add(buttonPanel);
+    }
+    void startGame(){
+          gamePanel=new GamePanel(this);
+        this.setContentPane(gamePanel);
+        gamePanel.requestFocusInWindow();
+        this.revalidate();
+    }
+    public static void main(String[] args){
+        SkySurvivor game=new SkySurvivor();
+        game.setVisible(true);
     }
 }
