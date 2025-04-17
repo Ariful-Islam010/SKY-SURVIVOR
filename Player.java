@@ -14,7 +14,7 @@ public class Player {
     Image playerPic;
     int groundY=500;
 
-    void update(int screenWidth, int screenHeight) {
+    void update(int screenWidth,int screenHeight) {
         x=x+speedX;
         y=y+speedY;
 
@@ -40,7 +40,7 @@ public class Player {
                     y=groundY;
                     jumping=false;
                 }
-      }
+            }
         }
     }
 }
