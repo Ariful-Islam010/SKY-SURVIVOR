@@ -11,6 +11,7 @@ public class GamePanel extends JPanel implements ActionListener {
     long lastFireTime=0;
     int maxFireballs=3;
     int fireCooldown=3000;
+    int fireballsFallenCount = 0; 
 
     public GamePanel(SkySurvivor game) {
         this.game=game;
@@ -81,7 +82,10 @@ public class GamePanel extends JPanel implements ActionListener {
         for (int i=fireballs.size()-1;i>=0;i--) {
             Fire fire=fireballs.get(i);
             fire.update(getHeight());
-            if (!fire.active) fireballs.remove(i);
+            if (!fire.active) {
+                fireballs.remove(i);
+                fireballsFallenCount++; // Increment counter when a fireball falls off screen
+            }
         }
         repaint();
     }
@@ -94,5 +98,10 @@ public class GamePanel extends JPanel implements ActionListener {
         for (Fire fire:fireballs) {
             g.drawImage(fire.firePic,fire.x,fire.y,fire.width,fire.height, this);
         }
+
+        // Display fireball counter
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.drawString("Fireballs Fallen: " + fireballsFallenCount, 20, 30);
     }
 }
