@@ -84,7 +84,7 @@ public class GamePanel extends JPanel implements ActionListener {
             fire.update(getHeight());
             if (!fire.active) {
                 fireballs.remove(i);
-                fireballsFallenCount++; // Increment counter when a fireball falls off screen
+                fireballsFallenCount++; 
             }
         }
         repaint();
@@ -93,15 +93,13 @@ public class GamePanel extends JPanel implements ActionListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Draw player and fireballs
         g.drawImage(player.playerPic, player.x, player.y, player.width, player.height, this);
         for (Fire fire:fireballs) {
             g.drawImage(fire.firePic,fire.x,fire.y,fire.width,fire.height, this);
         }
 
-        // Display fireball counter
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, 20));
-        g.drawString("Fireballs Fallen: " + fireballsFallenCount, 20, 30);
+        g.drawString("Fire Count: " + fireballsFallenCount, 20, 30);
     }
 }
