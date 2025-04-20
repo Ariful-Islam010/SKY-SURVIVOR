@@ -1,8 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
+import javax.swing.border.*;
 
 public class SkySurvivor extends JFrame {
     GamePanel gamePanel;
+    Image bgImage;
 
     public SkySurvivor() {
         setTitle("Sky Survivor");
@@ -10,19 +12,27 @@ public class SkySurvivor extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+        bgImage=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\git clone\\Game Project\\src\\image\\framebg.jpg").getImage();
+        JPanel menuPanel=new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(bgImage, 0, 0,getWidth(),getHeight(), this);
+            }
+        };
 
-        //Create menu with button
-        JPanel menuPanel=new JPanel(new GridBagLayout());
-        JButton startButton=new JButton("Start Game");
-        startButton.setFont(new Font("Arial", Font.BOLD, 24));
-        startButton.addActionListener(e -> {
+        JButton s=new JButton("Start Game");
+        s.setFont(new Font("Arial", Font.BOLD, 24));
+
+        s.setBorder(BorderFactory.createEmptyBorder());
+
+        s.addActionListener(e -> {
             gamePanel=new GamePanel(this);
             setContentPane(gamePanel);
             gamePanel.requestFocusInWindow();
             revalidate();
         });
-
-        menuPanel.add(startButton);
+        menuPanel.add(s);
         add(menuPanel);
         setVisible(true);
     }
