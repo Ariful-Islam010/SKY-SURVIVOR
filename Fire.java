@@ -1,7 +1,5 @@
 import java.awt.*;
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
+import javax.swing.ImageIcon;
 
 public class Fire {
     int x,y;
@@ -16,8 +14,8 @@ public class Fire {
         this.y=startY;
 
         try {
-            firePic=ImageIO.read(new File("C:\\Users\\hp\\OneDrive\\Desktop\\git clone\\Game Project\\src\\image\\fireball.png"));
-        } catch (IOException e) {
+            firePic=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\git clone\\Game Project\\src\\image\\fireball.png").getImage();
+        } catch(Exception e) {
             System.out.println("Error loading fire image: " + e);
         }
     }
