@@ -12,7 +12,7 @@ public class SkySurvivor extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
-        bgImage=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\git clone\\Game Project\\src\\image\\framebg.jpg").getImage();
+        bgImage=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\image\\framebg.jpg").getImage();
         JPanel menuPanel=new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
