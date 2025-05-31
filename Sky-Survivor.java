@@ -12,32 +12,59 @@ public class SkySurvivor extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
-        bgImage=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\image\\framebg.jpg").getImage();
-        JPanel menuPanel=new JPanel(new GridBagLayout()) {
+        try {
+            bgImage=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\image\\framebg.jpg").getImage();
+        } catch(Exception e) {
+            System.out.println("Error loading background image: " + e);
+        }
+        showMainMenu();
+        setVisible(true);
+    }
+
+    public void showMainMenu() {
+        JPanel menuPanel = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(bgImage, 0, 0,getWidth(),getHeight(), this);
+                g.drawImage(bgImage, 0, 0, getWidth(), getHeight(), this);
             }
         };
 
-        JButton s=new JButton("Start Game");
-        s.setFont(new Font("Arial", Font.BOLD, 24));
+        JPanel buttonPanel=new JPanel(new GridLayout(2, 1, 0, 20));
+        buttonPanel.setOpaque(false);
 
-        s.setBorder(BorderFactory.createEmptyBorder());
+        JButton startButton=new JButton("Start Game");
+        startButton.setFont(new Font("Arial", Font.BOLD, 24));
+        startButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        startButton.setBackground(new Color(70, 130, 180));
+        startButton.setForeground(Color.WHITE);
+        startButton.setFocusPainted(false);
 
-        s.addActionListener(e -> {
+        startButton.addActionListener(e -> {
             gamePanel=new GamePanel(this);
             setContentPane(gamePanel);
             gamePanel.requestFocusInWindow();
             revalidate();
         });
-        menuPanel.add(s);
-        add(menuPanel);
-        setVisible(true);
+
+        // Exit button
+        JButton exitButton=new JButton("Exit Game");
+        exitButton.setFont(new Font("Arial", Font.BOLD, 24));
+        exitButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        exitButton.setBackground(new Color(178, 34, 34));
+        exitButton.setForeground(Color.WHITE);
+        exitButton.setFocusPainted(false);
+
+        exitButton.addActionListener(e -> {
+            System.exit(0);
+        });
+        buttonPanel.add(startButton);
+        buttonPanel.add(exitButton);
+        menuPanel.add(buttonPanel);
+        setContentPane(menuPanel);
     }
 
     public static void main(String[] args) {
-        new SkySurvivor();
+        SwingUtilities.invokeLater(() -> new SkySurvivor());
     }
 }
