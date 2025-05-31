@@ -2,9 +2,9 @@ import java.awt.*;
 import javax.swing.ImageIcon;
 
 public class Star {
-    int x,y;
+    int x, y;
     int width=30;
-    int height=30;
+    int height = 30;
     boolean active=true;
     Image starPic;
     long creationTime;
