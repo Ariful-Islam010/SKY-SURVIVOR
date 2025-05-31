@@ -22,6 +22,8 @@ public class GamePanel extends JPanel implements ActionListener {
     public GamePanel(SkySurvivor game) {
         this.game=game;
         this.setFocusable(true);
+        setLayout(null);
+
         p = new Player();
 
         try {
@@ -31,41 +33,48 @@ public class GamePanel extends JPanel implements ActionListener {
             System.out.println("Error loading image: " + e);
         }
 
-        // Create initial star
         createNewStar();
 
-        // Key listener with both key code and character support
         addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                int key = e.getKeyCode();
-                char keyChar = Character.toUpperCase(e.getKeyChar());
+                int key=e.getKeyCode();
+                char keyChar=Character.toUpperCase(e.getKeyChar());
 
-                if (gameOver && (key == KeyEvent.VK_ENTER || keyChar == 'R')) {
+                // Keep ESC key functionality
+                if (key==KeyEvent.VK_ESCAPE) {
+                    t.stop();
+                    game.showMainMenu();
+                    game.revalidate();
+                    return;
+                }
+
+                if (gameOver) {
+                    // Auto-restart on any key if game over
                     resetGame();
                     return;
                 }
 
+                // Regular movement controls
                 if (key==KeyEvent.VK_UP || keyChar=='U')
                     p.speedY=-5;
                 if (key==KeyEvent.VK_DOWN || keyChar=='D')
                     p.speedY = 5;
-                if (key == KeyEvent.VK_LEFT || keyChar =='L')
+                if (key==KeyEvent.VK_LEFT || keyChar=='L')
                     p.speedX=-5;
                 if (key==KeyEvent.VK_RIGHT || keyChar=='R')
-                    p.speedX = 5;
-                if ((key==KeyEvent.VK_SPACE || keyChar=='J') && !p.jumping) {
-                    p.jumping=true;
-                    p.jumpHeight=0;
+                    p.speedX=5;
+                if (key==KeyEvent.VK_SPACE || keyChar=='J') {
+                    p.jump();
                 }
             }
 
             public void keyReleased(KeyEvent e) {
-                int key = e.getKeyCode();
-                char keyChar = Character.toUpperCase(e.getKeyChar());
+                int key=e.getKeyCode();
+                char keyChar=Character.toUpperCase(e.getKeyChar());
 
-                if ((key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN ||
-                        keyChar == 'U' || keyChar == 'D') && p.speedY != 0) {
-                    p.speedY = 0;
+                if ((key==KeyEvent.VK_UP || key==KeyEvent.VK_DOWN ||
+                        keyChar=='U' || keyChar=='D') && p.speedY != 0) {
+                    p.speedY =0;
                 }
                 if ((key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT ||
                         keyChar == 'L' || keyChar == 'R') && p.speedX != 0) {
@@ -86,24 +95,27 @@ public class GamePanel extends JPanel implements ActionListener {
         currentStar = null;
         createNewStar();
         p.x = 300;
-        p.y = 300;
+        p.y = p.groundY;  // Start on ground
         p.speedX = 0;
         p.speedY = 0;
         p.jumping = false;
     }
 
     private void createFireballs() {
-        int num = (int)(Math.random() * 5);
+        int num = 1 + (int)(Math.random() * 5);
         for (int i = 0; i < num; i++) {
             int x = (int)(Math.random() * (getWidth() - 30));
-            fireballs.add(new Fire(x, -30));
+            // Random speed (3-7)
+            int speed = 3 + (int)(Math.random() * 5);
+            Fire fire = new Fire(x, -30);
+            fire.speed = speed;
+            fireballs.add(fire);
         }
     }
 
     private void createNewStar() {
-        // Create a star at a random position within the game area
-        int x=(int)(Math.random()*(getWidth()-30));
-        int y=(int)(Math.random() * (getHeight() - 100)) ;
+        int x = (int)(Math.random() * (getWidth() - 30));
+        int y = (int)(Math.random() * (getHeight() - 100));
         currentStar = new Star(x, y);
     }
 
@@ -116,28 +128,26 @@ public class GamePanel extends JPanel implements ActionListener {
 
             p.update(getWidth(), getHeight());
 
-            // Create new fireballs
-            long currentTime=System.currentTimeMillis();
+            long currentTime = System.currentTimeMillis();
             if (currentTime-lastFireTime>fireCooldown) {
                 createFireballs();
-                lastFireTime=currentTime;
+                lastFireTime = currentTime;
             }
 
-            // Check star expired
             if (currentStar!=null && currentStar.isExpired()) {
                 createNewStar();
             }
 
-            // Fire update and collision detection
-            for (int i=fireballs.size()-1;i>=0;i--) {
+            for (int i = fireballs.size()-1;i>=0;i--) {
                 Fire fire = fireballs.get(i);
                 fire.update(getHeight());
 
-                // Simple collision check
-                if (fire.x<p.x+p.width &&
-                        fire.x+fire.width>p.x &&
-                        fire.y<p.y+p.height &&
-                        fire.y+fire.height>p.y) {
+                //collision
+                int collisionMargin = 10;
+                if (fire.x < p.x + p.width - collisionMargin &&
+                        fire.x + fire.width - collisionMargin > p.x + collisionMargin &&
+                        fire.y < p.y + p.height - collisionMargin &&
+                        fire.y+fire.height-collisionMargin>p.y+collisionMargin) {
                     gameOver=true;
                 }
 
@@ -147,14 +157,16 @@ public class GamePanel extends JPanel implements ActionListener {
                 }
             }
 
-            // Star collision detection
-            if (currentStar != null &&
-                    currentStar.x<p.x+p.width &&
-                    currentStar.x+currentStar.width>p.x &&
-                    currentStar.y<p.y+p.height &&
-                    currentStar.y+currentStar.height>p.y) {
-                score+=10;
-                createNewStar();
+            // Star collision detection with improved hitbox
+            if (currentStar != null) {
+                int collisionMargin = 10;
+                if (currentStar.x < p.x + p.width - collisionMargin &&
+                        currentStar.x + currentStar.width - collisionMargin > p.x + collisionMargin &&
+                        currentStar.y < p.y + p.height - collisionMargin &&
+                        currentStar.y + currentStar.height - collisionMargin > p.y + collisionMargin) {
+                    score += 10;
+                    createNewStar();
+                }
             }
         }
         repaint();
@@ -163,25 +175,37 @@ public class GamePanel extends JPanel implements ActionListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Draw two backgrounds for scrolling effect
-        g.drawImage(bgImage,0,bgY-getHeight(),getWidth(),getHeight(),this);
+        g.drawImage(bgImage, 0, bgY - getHeight(), getWidth(), getHeight(), this);
         g.drawImage(bgImage, 0, bgY, getWidth(), getHeight(), this);
 
-        // Draw player
         g.drawImage(p.playerPic, p.x, p.y, p.width, p.height, this);
-
 
         for (Fire fire : fireballs) {
             g.drawImage(fire.firePic, fire.x, fire.y, fire.width, fire.height, this);
         }
+
         if (currentStar != null) {
             g.drawImage(currentStar.starPic, currentStar.x, currentStar.y, currentStar.width, currentStar.height, this);
         }
 
-        g.setColor(Color.WHITE);
+        g.setColor(Color.red);
         g.setFont(new Font("Arial", Font.BOLD, 20));
-        g.drawString("Fire Count: " + fireCount, 20, 30);
-        g.drawString("Score: " + score, 20, 60);
+        g.drawString("Fire Count: "+fireCount, 20, 30);
+        g.drawString("Score: "+score, 20, 60);
 
+        if (gameOver) {
+            g.setColor(new Color(0, 0, 0, 180));
+            g.fillRect(0, 0, getWidth(), getHeight());
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 36));
+            String gameOverText = "Game Over";
+            int textWidth = g.getFontMetrics().stringWidth(gameOverText);
+            g.drawString(gameOverText, (getWidth() - textWidth) / 2, getHeight() / 2 - 40);
+
+            g.setFont(new Font("Arial", Font.BOLD, 24));
+            String scoreText="Score: " + score;
+            textWidth=g.getFontMetrics().stringWidth(scoreText);
+            g.drawString(scoreText, (getWidth()-textWidth)/2, getHeight() / 2);
+        }
     }
 }
