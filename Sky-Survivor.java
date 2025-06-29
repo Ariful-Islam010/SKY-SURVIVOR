@@ -5,6 +5,7 @@ import javax.swing.border.*;
 public class SkySurvivor extends JFrame {
     GamePanel gamePanel;
     Image bgImage;
+    private SoundManager soundManager;
 
     public SkySurvivor() {
         setTitle("Sky Survivor");
@@ -12,21 +13,24 @@ public class SkySurvivor extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+        soundManager=SoundManager.getInstance();
+
         try {
             bgImage=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\image\\framebg.jpg").getImage();
         } catch(Exception e) {
             System.out.println("Error loading background image: " + e);
         }
+
         showMainMenu();
         setVisible(true);
     }
 
     public void showMainMenu() {
-        JPanel menuPanel = new JPanel(new GridBagLayout()) {
+        JPanel menuPanel=new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(bgImage, 0, 0, getWidth(), getHeight(), this);
+                g.drawImage(bgImage, 0, 0, getWidth(), getHeight(),this);
             }
         };
 
@@ -34,13 +38,15 @@ public class SkySurvivor extends JFrame {
         buttonPanel.setOpaque(false);
 
         JButton startButton=new JButton("Start Game");
-        startButton.setFont(new Font("Arial", Font.BOLD, 24));
+        startButton.setFont(new Font("Arial",Font.BOLD, 24));
         startButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         startButton.setBackground(new Color(70, 130, 180));
         startButton.setForeground(Color.WHITE);
         startButton.setFocusPainted(false);
 
         startButton.addActionListener(e -> {
+            soundManager.playSound("gameStart");
+
             gamePanel=new GamePanel(this);
             setContentPane(gamePanel);
             gamePanel.requestFocusInWindow();
@@ -58,6 +64,7 @@ public class SkySurvivor extends JFrame {
         exitButton.addActionListener(e -> {
             System.exit(0);
         });
+
         buttonPanel.add(startButton);
         buttonPanel.add(exitButton);
         menuPanel.add(buttonPanel);
