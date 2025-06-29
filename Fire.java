@@ -2,7 +2,7 @@ import java.awt.*;
 import javax.swing.ImageIcon;
 
 public class Fire {
-    int x, y;
+    int x,y;
     int width=30;
     int height=30;
     int speed=5;
@@ -13,15 +13,15 @@ public class Fire {
         this.x=startX;
         this.y=startY;
         try {
-            firePic = new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\image\\fireball.png").getImage();
+            firePic=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\image\\fireball.png").getImage();
         } catch(Exception e) {
-            System.out.println("Error loading fire image : " + e);
+            System.out.println("Error loading fire image : "+e);
         }
     }
 
     public void update(int screenHeight) {
         y+=speed;
         if (y>screenHeight)
-            active = false;
+            active=false;
     }
 }
