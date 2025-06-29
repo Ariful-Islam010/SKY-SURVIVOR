@@ -9,11 +9,15 @@ public class GamePanel extends JPanel implements ActionListener {
     SkySurvivor game;
     ArrayList<Fire> fireballs=new ArrayList<>();
     Star currentStar=null;
+    ImmunityStar currentImmunityStar=null;
     long lastFireTime=0;
+    long lastImmunityStarTime=0;
     int maxFireballs=10;
-    int fireCooldown=3000; // milliseconds
+    int fireCooldown=3000;
+    int immunityStarCooldown=15000;
     int fireCount=0;
     int score=0;
+    private SoundManager soundManager;
 
     private Image bgImage;
     private int bgY=0;
@@ -23,8 +27,9 @@ public class GamePanel extends JPanel implements ActionListener {
         this.game=game;
         this.setFocusable(true);
         setLayout(null);
+        soundManager=SoundManager.getInstance();
 
-        p = new Player();
+        p=new Player();
 
         try {
             p.playerPic=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\image\\player.png").getImage();
@@ -49,12 +54,11 @@ public class GamePanel extends JPanel implements ActionListener {
                 }
 
                 if (gameOver) {
-                    // Auto-restart on any key if game over
                     resetGame();
                     return;
                 }
 
-                // Regular movement controls
+                // Regular movement controls (work when not jumping)
                 if (key==KeyEvent.VK_UP || keyChar=='U')
                     p.speedY=-5;
                 if (key==KeyEvent.VK_DOWN || keyChar=='D')
@@ -63,6 +67,8 @@ public class GamePanel extends JPanel implements ActionListener {
                     p.speedX=-5;
                 if (key==KeyEvent.VK_RIGHT || keyChar=='R')
                     p.speedX=5;
+
+                // Jumping with spacebar - Angry Birds style
                 if (key==KeyEvent.VK_SPACE || keyChar=='J') {
                     p.jump();
                 }
@@ -93,12 +99,14 @@ public class GamePanel extends JPanel implements ActionListener {
         fireCount = 0;
         fireballs.clear();
         currentStar = null;
+        currentImmunityStar = null;
         createNewStar();
         p.x = 300;
         p.y = p.groundY;  // Start on ground
         p.speedX = 0;
         p.speedY = 0;
         p.jumping = false;
+        p.hasImmunity = false;
     }
 
     private void createFireballs() {
@@ -119,6 +127,12 @@ public class GamePanel extends JPanel implements ActionListener {
         currentStar = new Star(x, y);
     }
 
+    private void createNewImmunityStar() {
+        int x = (int)(Math.random() * (getWidth() - 40));
+        int y = (int)(Math.random() * (getHeight() - 100));
+        currentImmunityStar = new ImmunityStar(x, y);
+    }
+
     public void actionPerformed(ActionEvent e) {
         if (!gameOver) {
             bgY += 2;
@@ -134,21 +148,37 @@ public class GamePanel extends JPanel implements ActionListener {
                 lastFireTime = currentTime;
             }
 
+            // Immunity star creation - less frequent (15 seconds)
+            if (currentImmunityStar == null && currentTime - lastImmunityStarTime > immunityStarCooldown) {
+                createNewImmunityStar();
+                lastImmunityStarTime = currentTime;
+            }
+
             if (currentStar!=null && currentStar.isExpired()) {
                 createNewStar();
+            }
+
+            // Immunity star update
+            if (currentImmunityStar != null) {
+                currentImmunityStar.updateGlow();
+                if (currentImmunityStar.isExpired()) {
+                    currentImmunityStar = null;
+                }
             }
 
             for (int i = fireballs.size()-1;i>=0;i--) {
                 Fire fire = fireballs.get(i);
                 fire.update(getHeight());
 
-                //collision
-                int collisionMargin = 10;
-                if (fire.x < p.x + p.width - collisionMargin &&
-                        fire.x + fire.width - collisionMargin > p.x + collisionMargin &&
-                        fire.y < p.y + p.height - collisionMargin &&
-                        fire.y+fire.height-collisionMargin>p.y+collisionMargin) {
-                    gameOver=true;
+                //collision - only when not immune
+                if (!p.isImmune()) {
+                    int collisionMargin = 10;
+                    if (fire.x < p.x + p.width - collisionMargin &&
+                            fire.x + fire.width - collisionMargin > p.x + collisionMargin &&
+                            fire.y < p.y + p.height - collisionMargin &&
+                            fire.y+fire.height-collisionMargin>p.y+collisionMargin) {
+                        gameOver=true;
+                    }
                 }
 
                 if (!fire.active) {
@@ -157,7 +187,7 @@ public class GamePanel extends JPanel implements ActionListener {
                 }
             }
 
-            // Star collision detection with improved hitbox
+            // Star collision detection with sound effect
             if (currentStar != null) {
                 int collisionMargin = 10;
                 if (currentStar.x < p.x + p.width - collisionMargin &&
@@ -165,7 +195,22 @@ public class GamePanel extends JPanel implements ActionListener {
                         currentStar.y < p.y + p.height - collisionMargin &&
                         currentStar.y + currentStar.height - collisionMargin > p.y + collisionMargin) {
                     score += 10;
+                    soundManager.playSound("starCollect"); // Play star collection sound
                     createNewStar();
+                }
+            }
+
+            // Immunity star collision with sound effect
+            if (currentImmunityStar != null) {
+                int collisionMargin = 10;
+                if (currentImmunityStar.x < p.x + p.width - collisionMargin &&
+                        currentImmunityStar.x + currentImmunityStar.width - collisionMargin > p.x + collisionMargin &&
+                        currentImmunityStar.y < p.y + p.height - collisionMargin &&
+                        currentImmunityStar.y + currentImmunityStar.height - collisionMargin > p.y + collisionMargin) {
+                    p.activateImmunity();
+                    score += 50;
+                    soundManager.playSound("immunityCollect"); // Play immunity collection sound
+                    currentImmunityStar = null;
                 }
             }
         }
@@ -178,21 +223,34 @@ public class GamePanel extends JPanel implements ActionListener {
         g.drawImage(bgImage, 0, bgY - getHeight(), getWidth(), getHeight(), this);
         g.drawImage(bgImage, 0, bgY, getWidth(), getHeight(), this);
 
+        // Immunity glow effect
+        if (p.isImmune()) {
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setColor(new Color(0, 255, 255, 100));
+            g2d.fillOval(p.x - 5, p.y - 5, p.width + 10, p.height + 10);
+        }
+
         g.drawImage(p.playerPic, p.x, p.y, p.width, p.height, this);
 
         for (Fire fire : fireballs) {
             g.drawImage(fire.firePic, fire.x, fire.y, fire.width, fire.height, this);
         }
-
         if (currentStar != null) {
             g.drawImage(currentStar.starPic, currentStar.x, currentStar.y, currentStar.width, currentStar.height, this);
+        }
+        if (currentImmunityStar != null) {
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setColor(new Color(255, 255, 0, (int)(currentImmunityStar.getGlowAlpha() * 255)));
+            g2d.fillOval(currentImmunityStar.x - 8, currentImmunityStar.y - 8,
+                    currentImmunityStar.width + 16, currentImmunityStar.height + 16);
+            g.drawImage(currentImmunityStar.immunityStarPic, currentImmunityStar.x, currentImmunityStar.y,
+                    currentImmunityStar.width, currentImmunityStar.height, this);
         }
 
         g.setColor(Color.red);
         g.setFont(new Font("Arial", Font.BOLD, 20));
         g.drawString("Fire Count: "+fireCount, 20, 30);
         g.drawString("Score: "+score, 20, 60);
-
         if (gameOver) {
             g.setColor(new Color(0, 0, 0, 180));
             g.fillRect(0, 0, getWidth(), getHeight());
@@ -200,7 +258,7 @@ public class GamePanel extends JPanel implements ActionListener {
             g.setFont(new Font("Arial", Font.BOLD, 36));
             String gameOverText = "Game Over";
             int textWidth = g.getFontMetrics().stringWidth(gameOverText);
-            g.drawString(gameOverText, (getWidth() - textWidth) / 2, getHeight() / 2 - 40);
+            g.drawString(gameOverText, (getWidth()-textWidth)/2, getHeight()/2-40);
 
             g.setFont(new Font("Arial", Font.BOLD, 24));
             String scoreText="Score: " + score;
