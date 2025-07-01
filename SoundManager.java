@@ -21,9 +21,9 @@ public class SoundManager {
 
     private void loadSounds() {
         try {
-            loadSound("gameStart", "C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\game-music-loop.wav");
-            loadSound("starCollect", "C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\collect-star.wav");
-            loadSound("immunityCollect", "C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\collect-star.wav");
+            loadSound("gameStart", "C:\\Users\\User\\OneDrive\\Desktop\\Sky Survivor\\src\\game-music-loop.wav");
+            loadSound("starCollect", "C:\\Users\\User\\OneDrive\\Desktop\\Sky Survivor\\src\\collect-star.wav");
+            loadSound("immunityCollect", "C:\\Users\\User\\OneDrive\\Desktop\\Sky Survivor\\src\\collect-star.wav");
         } catch (Exception e) {
             System.out.println("Error loading sounds: " + e.getMessage());
         }
@@ -49,7 +49,7 @@ public class SoundManager {
         Clip clip=soundClips.get(soundName);
         if (clip!=null) {
             try {
-                clip.setFramePosition(0); // Reset to beginning
+                clip.setFramePosition(0);
                 clip.start();
             } catch (Exception e) {
                 System.out.println("Error playing sound " + soundName + ": " + e.getMessage());
