@@ -17,7 +17,7 @@ public class ImmunityStar {
         this.y=startY;
         this.creationTime=System.currentTimeMillis();
         try {
-            immunityStarPic=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\image\\star.png").getImage();
+            immunityStarPic=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Sky Survivor\\src\\image\\star.png").getImage();
         } catch(Exception e) {
             System.out.println("Error loading immunity star image: " + e);
         }
