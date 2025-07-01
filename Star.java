@@ -15,7 +15,7 @@ public class Star {
         this.y=startY;
         this.creationTime=System.currentTimeMillis();
         try {
-            starPic=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\image\\star.png").getImage();
+            starPic=new ImageIcon("C:\\Users\\User\\OneDrive\\Desktop\\Sky Survivor\\src\\image\\star.png").getImage();
         } catch(Exception e) {
             System.out.println("Error loading star image: " + e);
         }
