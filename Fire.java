@@ -13,7 +13,7 @@ public class Fire {
         this.x=startX;
         this.y=startY;
         try {
-            firePic=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\image\\fireball.png").getImage();
+            firePic=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Sky Survivor\\src\\image\\fireball.png").getImage();
         } catch(Exception e) {
             System.out.println("Error loading fire image : "+e);
         }
