@@ -45,7 +45,7 @@ public class GamePanel extends JPanel implements ActionListener {
                 int key=e.getKeyCode();
                 char keyChar=Character.toUpperCase(e.getKeyChar());
 
-                // Keep ESC key functionality
+                // ESC key functionality
                 if (key==KeyEvent.VK_ESCAPE) {
                     t.stop();
                     game.showMainMenu();
@@ -58,20 +58,15 @@ public class GamePanel extends JPanel implements ActionListener {
                     return;
                 }
 
-                // Regular movement controls (work when not jumping)
+                // Simple movement controls only
                 if (key==KeyEvent.VK_UP || keyChar=='U')
-                    p.speedY=-5;
+                    p.speedY=-3;
                 if (key==KeyEvent.VK_DOWN || keyChar=='D')
-                    p.speedY = 5;
+                    p.speedY = 3;
                 if (key==KeyEvent.VK_LEFT || keyChar=='L')
                     p.speedX=-5;
                 if (key==KeyEvent.VK_RIGHT || keyChar=='R')
                     p.speedX=5;
-
-                // Jumping with spacebar - Angry Birds style
-                if (key==KeyEvent.VK_SPACE || keyChar=='J') {
-                    p.jump();
-                }
             }
 
             public void keyReleased(KeyEvent e) {
@@ -79,11 +74,11 @@ public class GamePanel extends JPanel implements ActionListener {
                 char keyChar=Character.toUpperCase(e.getKeyChar());
 
                 if ((key==KeyEvent.VK_UP || key==KeyEvent.VK_DOWN ||
-                        keyChar=='U' || keyChar=='D') && p.speedY != 0) {
+                        keyChar=='U' || keyChar=='D')) {
                     p.speedY =0;
                 }
                 if ((key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT ||
-                        keyChar == 'L' || keyChar == 'R') && p.speedX != 0) {
+                        keyChar == 'L' || keyChar == 'R')) {
                     p.speedX = 0;
                 }
             }
@@ -102,10 +97,9 @@ public class GamePanel extends JPanel implements ActionListener {
         currentImmunityStar = null;
         createNewStar();
         p.x = 300;
-        p.y = p.groundY;  // Start on ground
+        p.y = 500;
         p.speedX = 0;
         p.speedY = 0;
-        p.jumping = false;
         p.hasImmunity = false;
     }
 
@@ -113,7 +107,6 @@ public class GamePanel extends JPanel implements ActionListener {
         int num = 1 + (int)(Math.random() * 5);
         for (int i = 0; i < num; i++) {
             int x = (int)(Math.random() * (getWidth() - 30));
-            // Random speed (3-7)
             int speed = 3 + (int)(Math.random() * 5);
             Fire fire = new Fire(x, -30);
             fire.speed = speed;
@@ -148,7 +141,6 @@ public class GamePanel extends JPanel implements ActionListener {
                 lastFireTime = currentTime;
             }
 
-            // Immunity star creation - less frequent (15 seconds)
             if (currentImmunityStar == null && currentTime - lastImmunityStarTime > immunityStarCooldown) {
                 createNewImmunityStar();
                 lastImmunityStarTime = currentTime;
@@ -158,7 +150,6 @@ public class GamePanel extends JPanel implements ActionListener {
                 createNewStar();
             }
 
-            // Immunity star update
             if (currentImmunityStar != null) {
                 currentImmunityStar.updateGlow();
                 if (currentImmunityStar.isExpired()) {
@@ -170,7 +161,6 @@ public class GamePanel extends JPanel implements ActionListener {
                 Fire fire = fireballs.get(i);
                 fire.update(getHeight());
 
-                //collision - only when not immune
                 if (!p.isImmune()) {
                     int collisionMargin = 10;
                     if (fire.x < p.x + p.width - collisionMargin &&
@@ -187,7 +177,6 @@ public class GamePanel extends JPanel implements ActionListener {
                 }
             }
 
-            // Star collision detection with sound effect
             if (currentStar != null) {
                 int collisionMargin = 10;
                 if (currentStar.x < p.x + p.width - collisionMargin &&
@@ -195,12 +184,11 @@ public class GamePanel extends JPanel implements ActionListener {
                         currentStar.y < p.y + p.height - collisionMargin &&
                         currentStar.y + currentStar.height - collisionMargin > p.y + collisionMargin) {
                     score += 10;
-                    soundManager.playSound("starCollect"); // Play star collection sound
+                    soundManager.playSound("starCollect");
                     createNewStar();
                 }
             }
 
-            // Immunity star collision with sound effect
             if (currentImmunityStar != null) {
                 int collisionMargin = 10;
                 if (currentImmunityStar.x < p.x + p.width - collisionMargin &&
@@ -209,7 +197,7 @@ public class GamePanel extends JPanel implements ActionListener {
                         currentImmunityStar.y + currentImmunityStar.height - collisionMargin > p.y + collisionMargin) {
                     p.activateImmunity();
                     score += 50;
-                    soundManager.playSound("immunityCollect"); // Play immunity collection sound
+                    soundManager.playSound("immunityCollect");
                     currentImmunityStar = null;
                 }
             }
@@ -223,7 +211,6 @@ public class GamePanel extends JPanel implements ActionListener {
         g.drawImage(bgImage, 0, bgY - getHeight(), getWidth(), getHeight(), this);
         g.drawImage(bgImage, 0, bgY, getWidth(), getHeight(), this);
 
-        // Immunity glow effect
         if (p.isImmune()) {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setColor(new Color(0, 255, 255, 100));
