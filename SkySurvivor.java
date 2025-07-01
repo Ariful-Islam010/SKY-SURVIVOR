@@ -16,7 +16,7 @@ public class SkySurvivor extends JFrame {
         soundManager=SoundManager.getInstance();
 
         try {
-            bgImage=new ImageIcon("C:\\Users\\hp\\OneDrive\\Desktop\\Game Project\\src\\image\\framebg.jpg").getImage();
+            bgImage=new ImageIcon("C:\\Users\\User\\OneDrive\\Desktop\\Sky Survivor\\src\\image\\framebg.jpg").getImage();
         } catch(Exception e) {
             System.out.println("Error loading background image: " + e);
         }
@@ -53,7 +53,6 @@ public class SkySurvivor extends JFrame {
             revalidate();
         });
 
-        // Exit button
         JButton exitButton=new JButton("Exit Game");
         exitButton.setFont(new Font("Arial", Font.BOLD, 24));
         exitButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
